@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mini Drive Info Only</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .file-item {
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script type="text/babel">
+  function App() {
+    const [files, setFiles] = React.useState([]);
+    const [fileName, setFileName] = React.useState('');
+    const [fileType, setFileType] = React.useState('');
+    const [editingIndex, setEditingIndex] = React.useState(null);
+
+    const handleAddFile = () => {
+      if (fileName && fileType) {
+        if (editingIndex !== null) {
+          const updated = [...files];
+          updated[editingIndex] = { name: fileName, type: fileType };
+          setFiles(updated);
+          setEditingIndex(null);
+        } else {
+          const newFile = { name: fileName, type: fileType };
+          setFiles([...files, newFile]);
+        }
+        setFileName('');
+        setFileType('');
+      }
+    };
+
+    const handleDelete = (index) => {
+      const updatedFiles = files.filter((_, i) => i !== index);
+      setFiles(updatedFiles);
+      if (editingIndex === index) {
+        setEditingIndex(null);
+        setFileName('');
+        setFileType('');
+      }
+    };
+
+    const handleEdit = (index) => {
+      setFileName(files[index].name);
+      setFileType(files[index].type);
+      setEditingIndex(index);
+    };
+
+    return (
+      <div>
+        <h1>Mini Google Drive</h1>
+
+        <input 
+          type="text" 
+          placeholder="Informasi" 
+          value={fileName}
+          onChange={(e) => setFileName(e.target.value)}
+        />
+        <input 
+          type="text" 
+          placeholder="Hari, Tanggal, Tahun" 
+          value={fileType}
+          onChange={(e) => setFileType(e.target.value)}
+          style={{ marginLeft: '10px' }}
+        />
+        <button onClick={handleAddFile} style={{ marginLeft: '10px' }}>
+          {editingIndex !== null ? 'Simpan Perubahan' : 'Tambah'}
+        </button>
+
+        <h2>Daftar File:</h2>
+        <div>
+          {files.map((file, index) => (
+            <div key={index} className="file-item">
+              {file.name} ({file.type})
+              <button onClick={() => handleEdit(index)} style={{ marginLeft: '10px' }}>
+                Update
+              </button>
+              <button onClick={() => handleDelete(index)} style={{ marginLeft: '5px' }}>
+                Hapus
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(<App />);
+</script>
+
+</body>
+</html>
